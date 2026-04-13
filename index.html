@@ -1,0 +1,1837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modern CSS Features</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0e11;
+    --surface: #14161b;
+    --surface2: #1c1f27;
+    --border: #2a2d38;
+    --accent: #7efdd0;
+    --accent2: #f97dff;
+    --accent3: #fdce7e;
+    --text: #e8eaf0;
+    --muted: #6e7282;
+    --code-bg: #0a0b0e;
+    --radius: 10px;
+    --font-mono: 'DM Mono', monospace;
+    --font-serif: 'Instrument Serif', serif;
+    --font-sans: 'DM Sans', sans-serif;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    interpolate-size: allow-keywords;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-weight: 300;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* --- HEADER --- */
+  header {
+    padding: 80px 40px 60px;
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 32px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(40px, 7vw, 72px);
+    font-weight: 400;
+    font-style: italic;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: #fff;
+    margin-bottom: 20px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 15px;
+    max-width: 480px;
+  }
+
+  /* --- FILTERS --- */
+  .filters {
+    max-width: 900px;
+    margin: 0 auto 40px;
+    padding: 0 40px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .filter-btn:hover, .filter-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+  }
+
+  /* --- GRID --- */
+  .grid {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 40px 80px;
+    display: grid;
+    gap: 2px;
+  }
+
+  /* --- CARD --- */
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: #3a3d4a; }
+  .card.hidden { display: none; }
+
+  .card-header {
+    padding: 28px 32px 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    user-select: none;
+  }
+
+  .card-header-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    flex: 1;
+  }
+
+  .card-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .card-meta { flex: 1; }
+
+  .card-category {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .card-title {
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-weight: 500;
+    color: #fff;
+    line-height: 1.3;
+  }
+
+  .card-toggle {
+    color: var(--muted);
+    font-size: 18px;
+    transition: transform 0.25s;
+    flex-shrink: 0;
+    margin-top: 8px;
+  }
+  .card.open .card-toggle { transform: rotate(45deg); }
+
+  .card-body {
+    display: none;
+    padding: 0 32px 28px;
+    border-top: 1px solid var(--border);
+  }
+  .card.open .card-body { display: block; }
+
+  .card-desc {
+    padding-top: 22px;
+    color: #a9adc0;
+    font-size: 14px;
+    line-height: 1.75;
+    margin-bottom: 22px;
+  }
+
+  .code-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 22px;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: #c8cad8;
+  }
+
+  /* Syntax highlight classes */
+  .kw { color: #f97dff; }
+  .prop { color: #7efdd0; }
+  .val { color: #fdce7e; }
+  .sel { color: #82b4ff; }
+  .cmt { color: #4e5265; font-style: italic; }
+  .fn { color: #ff9f7e; }
+  .str { color: #a3f7b5; }
+
+  /* Category colors */
+  .cat-layout   { background: color-mix(in srgb, #7efdd0 12%, transparent); color: #7efdd0; }
+  .cat-selectors{ background: color-mix(in srgb, #f97dff 12%, transparent); color: #f97dff; }
+  .cat-animation{ background: color-mix(in srgb, #fdce7e 12%, transparent); color: #fdce7e; }
+  .cat-color    { background: color-mix(in srgb, #82b4ff 12%, transparent); color: #82b4ff; }
+  .cat-logic    { background: color-mix(in srgb, #ff9f7e 12%, transparent); color: #ff9f7e; }
+  .cat-forms    { background: color-mix(in srgb, #b4f7a3 12%, transparent); color: #b4f7a3; }
+  .cat-typography{ background: color-mix(in srgb, #ffa3c4 12%, transparent); color: #ffa3c4; }
+  .cat-scope    { background: color-mix(in srgb, #c4a3ff 12%, transparent); color: #c4a3ff; }
+
+  .text-layout    { color: #7efdd0; }
+  .text-selectors { color: #f97dff; }
+  .text-animation { color: #fdce7e; }
+  .text-color     { color: #82b4ff; }
+  .text-logic     { color: #ff9f7e; }
+  .text-forms     { color: #b4f7a3; }
+  .text-typography{ color: #ffa3c4; }
+  .text-scope     { color: #c4a3ff; }
+
+  /* --- FOOTER --- */
+  footer {
+    text-align: center;
+    padding: 40px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 600px) {
+    header, .filters, .grid { padding-left: 20px; padding-right: 20px; }
+    h1 { font-size: 36px; }
+    .card-header { padding: 20px; }
+    .card-body { padding: 0 20px 20px; }
+  }
+
+  /* =============================================
+     CSS REPLACES JS — SECTION
+     ============================================= */
+
+  .section-divider {
+    max-width: 900px;
+    margin: 60px auto 0;
+    padding: 0 40px;
+  }
+
+  .section-divider-line {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin-bottom: 60px;
+  }
+
+  .section-header {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 40px 12px;
+  }
+
+  .section-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 32px;
+    height: 1px;
+    background: var(--accent2);
+  }
+
+  .section-title {
+    font-family: var(--font-serif);
+    font-size: clamp(30px, 5vw, 52px);
+    font-weight: 400;
+    font-style: italic;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+
+  .section-subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    max-width: 500px;
+    margin-bottom: 48px;
+  }
+
+  /* Demo grid */
+  .demo-grid {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 40px 40px;
+    display: grid;
+    gap: 24px;
+  }
+
+  /* Demo card */
+  .demo-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .demo-card-head {
+    padding: 22px 28px 18px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .demo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 100px;
+    background: color-mix(in srgb, var(--accent2) 10%, transparent);
+    color: var(--accent2);
+    border: 1px solid color-mix(in srgb, var(--accent2) 25%, transparent);
+  }
+
+  .demo-title {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .demo-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .demo-stage {
+    border-top: 1px solid var(--border);
+    background: color-mix(in srgb, #000 30%, var(--surface));
+    padding: 32px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 160px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .demo-code-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .demo-code-col {
+    padding: 18px 20px;
+  }
+  .demo-code-col:first-child {
+    border-right: 1px solid var(--border);
+  }
+
+  .demo-code-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .demo-code-label.js { color: #f7df1e; }
+  .demo-code-label.css { color: var(--accent); }
+
+  .demo-code-label .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .demo-code-col pre {
+    font-size: 11px;
+    padding: 12px 14px;
+    background: var(--code-bg);
+    border-color: transparent;
+    margin: 0;
+  }
+
+  /* ---- Demo 1: Accordion / animate height ---- */
+  .css-accordion {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .css-accordion-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 6px;
+    overflow: hidden;
+  }
+
+  .css-accordion-item summary {
+    padding: 14px 18px;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text);
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+    background: var(--surface2);
+  }
+  .css-accordion-item summary::-webkit-details-marker { display: none; }
+  .css-accordion-item summary::after {
+    content: '+';
+    color: var(--accent);
+    font-size: 18px;
+    transition: transform 0.25s;
+  }
+  details[open] > summary::after { transform: rotate(45deg); }
+
+  .css-accordion-body {
+    font-size: 13px;
+    color: #a9adc0;
+    padding: 0 18px;
+    height: 0;
+    overflow: hidden;
+    transition: height 0.35s ease, padding 0.35s ease;
+  }
+  details[open] > .css-accordion-body {
+    height: auto;
+    padding: 14px 18px;
+  }
+
+  /* ---- Demo 2: Sticky header shrink ---- */
+  .scroll-demo-wrap {
+    width: 100%;
+    max-width: 380px;
+    height: 160px;
+    overflow-y: scroll;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    position: relative;
+    scroll-behavior: smooth;
+  }
+
+  .scroll-demo-inner {
+    padding-top: 56px;
+  }
+
+  .sticky-bar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    height: 52px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent);
+    transition: height 0.3s, background 0.3s;
+    animation: sticky-shrink linear both;
+    animation-timeline: scroll(nearest block);
+    animation-range: 0px 60px;
+  }
+
+  @keyframes sticky-shrink {
+    from { height: 52px; background: var(--surface); font-size: 13px; }
+    to   { height: 36px; background: #0a0b0e; font-size: 11px; }
+  }
+
+  .scroll-demo-content {
+    padding: 16px;
+  }
+  .scroll-demo-content p {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+
+  /* ---- Demo 3: Dark mode toggle ---- */
+  .theme-demo-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .theme-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+    user-select: none;
+  }
+
+  .theme-toggle-input { display: none; }
+
+  .theme-toggle-track {
+    width: 48px; height: 26px;
+    background: var(--border);
+    border-radius: 100px;
+    position: relative;
+    transition: background 0.3s;
+  }
+  .theme-toggle-track::after {
+    content: '';
+    position: absolute;
+    left: 3px; top: 3px;
+    width: 20px; height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.3s;
+  }
+  .theme-toggle-input:checked + .theme-toggle-track { background: var(--accent); }
+  .theme-toggle-input:checked + .theme-toggle-track::after { transform: translateX(22px); }
+
+  .theme-card-preview {
+    width: 260px;
+    border-radius: 10px;
+    padding: 20px;
+    transition: background 0.4s, color 0.4s, border-color 0.4s;
+    border: 1px solid #ddd;
+    background: #f8f8f8;
+    color: #222;
+  }
+
+  #theme-chk:checked ~ .theme-demo-wrap .theme-card-preview {
+    background: #1a1b23;
+    color: #e8eaf0;
+    border-color: #2a2d38;
+  }
+
+  .theme-card-preview h4 {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+  .theme-card-preview p {
+    font-size: 12px;
+    opacity: 0.6;
+    line-height: 1.5;
+  }
+
+  /* ---- Demo 4: Scroll-driven fade-in ---- */
+  .scroll-fade-wrap {
+    width: 100%;
+    max-width: 380px;
+    height: 180px;
+    overflow-y: scroll;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    scroll-behavior: smooth;
+  }
+
+  .scroll-fade-inner {
+    padding: 16px;
+  }
+
+  .fade-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+
+    animation: fade-up linear both;
+    animation-timeline: view(nearest);
+    animation-range: entry 0% entry 60%;
+  }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ---- Demo 5: CSS-only tooltip ---- */
+  .tooltip-demo {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .css-tooltip-wrap {
+    position: relative;
+    display: inline-block;
+  }
+
+  .css-tooltip-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    cursor: default;
+  }
+
+  .css-tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    background: #fff;
+    color: #111;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .css-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%; left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #fff;
+  }
+
+  .css-tooltip-wrap:hover .css-tooltip,
+  .css-tooltip-wrap:focus-within .css-tooltip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ---- Demo 6: Smooth scroll progress bar ---- */
+  .progress-demo-wrap {
+    width: 100%;
+    max-width: 380px;
+    height: 180px;
+    overflow-y: scroll;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    position: relative;
+  }
+
+  .progress-bar-track {
+    position: sticky;
+    top: 0;
+    height: 3px;
+    background: var(--border);
+    z-index: 10;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transform-origin: left;
+    transform: scaleX(0);
+    animation: grow-bar linear both;
+    animation-timeline: scroll(nearest block);
+  }
+
+  @keyframes grow-bar {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+  }
+
+  .progress-content {
+    padding: 16px;
+  }
+  .progress-content p {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+
+  /* ---- Demo 7: :has() — conditional styling ---- */
+  .has-demo-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .has-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .has-field:has(input:focus) {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 5%, var(--surface2));
+  }
+
+  .has-field:has(input:invalid:not(:placeholder-shown)) {
+    border-color: #f87171;
+    background: color-mix(in srgb, #f87171 6%, var(--surface2));
+  }
+
+  .has-field label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    transition: color 0.2s;
+  }
+  .has-field:has(input:focus) label { color: var(--accent); }
+  .has-field:has(input:invalid:not(:placeholder-shown)) label { color: #f87171; }
+
+  .has-field input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    width: 100%;
+  }
+
+  .has-submit {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 10px;
+    border-radius: 8px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .has-demo-form:has(input:valid) .has-submit {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+    font-weight: 500;
+  }
+
+  @media (max-width: 600px) {
+    .section-divider, .section-header, .demo-grid { padding-left: 20px; padding-right: 20px; }
+    .demo-code-row { grid-template-columns: 1fr; }
+    .demo-code-col:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+    .section-title { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Reference · 2024–2025</div>
+  <h1>Modern CSS Features</h1>
+  <p class="subtitle">A curated overview of the newest CSS capabilities — from layout primitives to logic functions.</p>
+</header>
+
+<div class="filters">
+  <button class="filter-btn active" data-filter="all">All</button>
+  <button class="filter-btn" data-filter="layout">Layout</button>
+  <button class="filter-btn" data-filter="selectors">Selectors</button>
+  <button class="filter-btn" data-filter="animation">Animation</button>
+  <button class="filter-btn" data-filter="color">Color</button>
+  <button class="filter-btn" data-filter="logic">Logic</button>
+  <button class="filter-btn" data-filter="forms">Forms & UI</button>
+  <button class="filter-btn" data-filter="typography">Typography</button>
+  <button class="filter-btn" data-filter="scope">Scope & Layers</button>
+</div>
+
+<div class="grid" id="grid">
+
+  <!-- Container Queries -->
+  <div class="card" data-category="layout">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <div class="card-icon cat-layout">⬜</div>
+        <div class="card-meta">
+          <div class="card-category text-layout">Layout</div>
+          <div class="card-title">Container Queries</div>
+        </div>
+      </div>
+      <div class="card-toggle">+</div>
+    </div>
+    <div class="card-body">
+      <p class="card-desc">Style elements based on their <em>parent container's</em> size — not just the viewport. A game-changer for reusable, truly modular components. Container units like <code>cqw</code> and <code>cqi</code> also let you size things relative to the container.</p>
+      <div class="code-label">Example</div>
+      <pre><span class="sel">.card</span> {
+  <span class="prop">container-type</span>: <span class="val">inline-size</span>;
+  <span class="prop">container-name</span>: <span class="val">card</span>;
+}
+
+<span class="kw">@container</span> card <span class="val">(min-width: 500px)</span> {
+  <span class="sel">.card__body</span> {
+    <span class="prop">display</span>: <span class="val">flex</span>;
+    <span class="prop">flex-direction</span>: <span class="val">row</span>;
+    <span class="prop">font-size</span>: <span class="fn">1.2cqi</span>; <span class="cmt">/* container query unit */</span>
+  }
+}</pre>
+    </div>
+  </div>
+
+  <!-- :has() -->
+  <div class="card" data-category="selectors">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <div class="card-icon cat-selectors">🎯</div>
+        <div class="card-meta">
+          <div class="card-category text-selectors">Selectors</div>
+          <div class="card-title">:has() — The Parent Selector</div>
+        </div>
+      </div>
+      <div class="card-toggle">+</div>
+    </div>
+    <div class="card-body">
+      <p class="card-desc">Select an element based on its <em>children or descendants</em>. Effectively CSS's first parent selector. Style a card differently if it has an image. Highlight a form if it contains invalid fields. Massive reduction in JavaScript for conditional styling.</p>
+      <div class="code-label">Example</div>
+      <pre><span class="cmt">/* Card with an image gets a taller layout */</span>
+<span class="sel">.card:has(img)</span> {
+  <span class="prop">grid-template-rows</span>: <span class="val">200px 1fr</span>;
+}
+
+<span class="cmt">/* Form with invalid fields turns red */</span>
+<span class="sel">form:has(:invalid)</span> {
+  <span class="prop">border</span>: <span class="val">2px solid crimson</span>;
+}
+
+<span class="cmt">/* Nav item that contains the current page link */</span>
+<span class="sel">li:has(a[aria-current="page"])</span> {
+  <span class="prop">font-weight</span>: <span class="val">bold</span>;
+}</pre>
+    </div>
+  </div>
+
+  <!-- CSS Nesting -->
+  <div class="card" data-category="scope">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <div class="card-icon cat-scope">🪆</div>
+        <div class="card-meta">
+          <div class="card-category text-scope">Scope & Layers</div>
+          <div class="card-title">CSS Nesting</div>
+        </div>
+      </div>
+      <div class="card-toggle">+</div>
+    </div>
+    <div class="card-body">
+      <p class="card-desc">Write nested selectors natively in CSS without a preprocessor. Child rules inherit the parent selector context, making component styles far more readable and co-located.</p>
+      <div class="code-label">Example</div>
+      <pre><span class="sel">.card</span> {
+  <span class="prop">background</span>: <span class="val">white</span>;
+  <span class="prop">padding</span>: <span class="val">1rem</span>;
+
+  <span class="sel">&:hover</span> {
+    <span class="prop">box-shadow</span>: <span class="val">0 4px 20px rgba(0,0,0,.1)</span>;
+  }
+
+  <span class="sel">& h2</span> {
+    <span class="prop">font-size</span>: <span class="val">1.25rem</span>;
+  }
+
+  <span class="kw">@media</span> <span class="val">(max-width: 600px)</span> {
+    <span class="prop">padding</span>: <span class="val">0.5rem</span>;
+  }
+}</pre>
+    </div>
+  </div>
+
+  <!-- @scope -->
+  <div class="card" data-category="scope">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <div class="card-icon cat-scope">🔒</div>
+        <div class="card-meta">
+          <div class="card-category text-scope">Scope & Layers</div>
+          <div class="card-title">@scope</div>
+        </div>
+      </div>
+      <div class="card-toggle">+</div>
+    </div>
+    <div class="card-body">
+      <p class="card-desc">Constrain styles to a specific subtree of the DOM. Prevents style leakage between components without needing BEM or CSS Modules. You can also define a "donut scope" — styles inside a root but outside a limit.</p>
+      <div class="code-label">Example</div>
+      <pre><span class="kw">@scope</span> (<span class="sel">.card</span>) {
+  <span class="sel">h2</span> { <span class="prop">color</span>: <span class="val">teal</span>; }
+  <span class="sel">p</span>  { <span class="prop">font-size</span>: <span class="val">0.9rem</span>; }
+}
+
+<span class="cmt">/* Donut scope: inside .card but not inside .card__footer */</span>
+<span class="kw">@scope</span> (<span class="sel">.card</span>) <span class="kw">to</span> (<span class="sel">.card__footer</span>) {
+  <span class="sel">a</span> { <span class="prop">color</span>: <span class="val">royalblue</span>; }
+}</pre>
+    </div>
+  </div>
+
+  <!-- Cascade Layers -->
+  <div class="card" data-category="scope">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <div class="card-icon cat-scope">🗂️</div>
+        <div class="card-meta">
+          <div class="card-category text-scope">Scope & Layers</div>
+          <div class="card-title">@layer — Cascade Layers</div>
+        </div>
+      </div>
+      <div class="card-toggle">+</div>
+    </div>
+    <div class="card-body">
+      <p class="card-desc">Explicitly control the cascade by grouping styles into named layers. Later-declared layers win regardless of specificity. Ideal for managing resets, third-party libraries, and component overrides predictably.</p>
+      <div class="code-label">Example</div>
+      <pre><span class="cmt">/* Declare order — later = higher priority */</span>
+<span class="kw">@layer</span> <span class="val">reset, base, components, utilities</span>;
+
+<span class="kw">@layer</span> <span class="val">reset</span> {
+  <span class="sel">*</span> { <span class="prop">margin</span>: <span class="val">0</span>; <span class="prop">box-sizing</span>: <span class="val">border-box</span>; }
+}
+
+<span class="kw">@layer</span> <span class="val">components</span> {
+  <span class="sel">.btn</span> { <span class="prop">padding</span>: <span class="val">.5rem 1rem</span>; }
+}
+
+<span class="kw">@layer</span> <span class="val">utilities</span> {
+  <span class="cmt">/* wins over components, even with same specificity */</span>
+  <span class="sel">.p-0</span> { <span class="prop">padding</span>: <span class="val">0</span>; }
+}</pre>
+    </div>
+  </div>
+
+  <!-- Subgrid -->
+  <div class="card" data-category="layout">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <div class="card-icon cat-layout">⊞</div>
+        <div class="card-meta">
+          <div class="card-category text-layout">Layout</div>
+          <div class="card-title">Subgrid</div>
+        </div>
+      </div>
+      <div class="card-toggle">+</div>
+    </div>
+    <div class="card-body">
+      <p class="card-desc">Let a nested grid element participate in its parent grid's tracks. This means child elements can align to the grandparent grid's columns/rows — no more manual track duplication for complex card layouts.</p>
+      <div class="code-label">Example</div>
+      <pre><span class="sel">.grid</span> {
+  <span class="prop">display</span>: <span class="val">grid</span>;
+  <span class="prop">grid-template-columns</span>: <span class="val">repeat(3, 1fr)</span>;
+  <span class="prop">grid-template-rows</span>: <span class="val">auto 1fr auto</span>;
+}
+
+<span class="sel">.card</span> {
+  <span class="prop">display</span>: <span class="val">grid</span>;
+  <span class="prop">grid-row</span>: <span class="val">span 3</span>;
+  <span class="cmt">/* inherit parent's row tracks */</span>
+  <span class="prop">grid-template-rows</span>: <span class="val">subgrid</span>;
+}
+<span class="cmt">/* Now header/body/footer of each card align across columns */</span></pre>
+    </div>
+  </div>
+
+  <!-- View Transitions -->
+  <div class="card" data-category="animation">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <div class="card-icon cat-animation">✨</div>
+        <div class="card-meta">
+          <div class="card-category text-animation">Animation</div>
+          <div class="card-title">View Transitions API</div>
+        </div>
+      </div>
+      <div class="card-toggle">+</div>
+    </div>
+    <div class="card-body">
+      <p class="card-desc">Animate between two DOM states — or even between page navigations — with a smooth crossfade or custom transition. Previously required complex FLIP JavaScript techniques. Cross-document transitions are now arriving too.</p>
+      <div class="code-label">Example</div>
+      <pre><span class="cmt">/* Trigger in JS */</span>
+<span class="fn">document.startViewTransition</span>(() => {
+  updateTheDom();
+});
+
+<span class="cmt">/* Customize the transition in CSS */</span>
+<span class="sel">::view-transition-old(root)</span> {
+  <span class="prop">animation</span>: <span class="val">fade-out 0.3s ease</span>;
+}
+<span class="sel">::view-transition-new(root)</span> {
+  <span class="prop">animation</span>: <span class="val">slide-in 0.3s ease</span>;
+}
+
+<span class="cmt">/* Named transition for a specific element */</span>
+<span class="sel">.hero-image</span> {
+  <span class="prop">view-transition-name</span>: <span class="val">hero</span>;
+}</pre>
+    </div>
+  </div>
+
+  <!-- Scroll-Driven Animations -->
+  <div class="card" data-category="animation">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <div class="card-icon cat-animation">🎞️</div>
+        <div class="card-meta">
+          <div class="card-category text-animation">Animation</div>
+          <div class="card-title">Scroll-Driven Animations</div>
+        </div>
+      </div>
+      <div class="card-toggle">+</div>
+    </div>
+    <div class="card-body">
+      <p class="card-desc">Tie CSS animation progress directly to scroll position or element visibility — all in CSS, no scroll event listeners. Use <code>animation-timeline: scroll()</code> for scroll position or <code>view()</code> for element entry/exit.</p>
+      <div class="code-label">Example</div>
+      <pre><span class="cmt">/* Progress bar tied to page scroll */</span>
+<span class="sel">.progress-bar</span> {
+  <span class="prop">animation</span>: <span class="val">grow linear</span>;
+  <span class="prop">animation-timeline</span>: <span class="fn">scroll(root block)</span>;
+}
+
+<span class="cmt">/* Fade in as element enters the viewport */</span>
+<span class="sel">.section</span> {
+  <span class="prop">animation</span>: <span class="val">fade-in linear both</span>;
+  <span class="prop">animation-timeline</span>: <span class="fn">view()</span>;
+  <span class="prop">animation-range</span>: <span class="val">entry 0% entry 40%</span>;
+}
+
+<span class="kw">@keyframes</span> <span class="val">grow</span> {
+  <span class="kw">from</span> { <span class="prop">transform</span>: <span class="fn">scaleX(0)</span>; }
+  <span class="kw">to</span>   { <span class="prop">transform</span>: <span class="fn">scaleX(1)</span>; }
+}</pre>
+    </div>
+  </div>
+
+  <!-- Animate to auto -->
+  <div class="card" data-category="animation">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <div class="card-icon cat-animation">↕️</div>
+        <div class="card-meta">
+          <div class="card-category text-animation">Animation</div>
+          <div class="card-title">Animate to auto / interpolate-size</div>
+        </div>
+      </div>
+      <div class="card-toggle">+</div>
+    </div>
+    <div class="card-body">
+      <p class="card-desc">For the first time, you can transition <code>height: 0</code> to <code>height: auto</code> natively in CSS. Use the <code>interpolate-size</code> property to opt-in globally, or use <code>calc-size()</code> for individual transitions.</p>
+      <div class="code-label">Example</div>
+      <pre><span class="cmt">/* Global opt-in */</span>
+<span class="sel">html</span> {
+  <span class="prop">interpolate-size</span>: <span class="val">allow-keywords</span>;
+}
+
+<span class="sel">.accordion-body</span> {
+  <span class="prop">height</span>: <span class="val">0</span>;
+  <span class="prop">overflow</span>: <span class="val">hidden</span>;
+  <span class="prop">transition</span>: <span class="val">height 0.35s ease</span>;
+}
+<span class="sel">.accordion-body.open</span> {
+  <span class="prop">height</span>: <span class="val">auto</span>; <span class="cmt">/* now animates! */</span>
+}
+
+<span class="cmt">/* Alternative: calc-size() per element */</span>
+<span class="sel">.item.open</span> {
+  <span class="prop">height</span>: <span class="fn">calc-size(auto, size)</span>;
+}</pre>
+    </div>
+  </div>
+
+  <!-- Anchor Positioning -->
+  <div class="card" data-category="layout">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <div class="card-icon cat-layout">⚓</div>
+        <div class="card-meta">
+          <div class="card-category text-layout">Layout</div>
+          <div class="card-title">Anchor Positioning</div>
+        </div>
+      </div>
+      <div class="card-toggle">+</div>
+    </div>
+    <div class="card-body">
+      <p class="card-desc">Tether an absolutely-positioned element to another element (the anchor) anywhere in the DOM — regardless of stacking context. Perfect for tooltips, popovers, and dropdowns that need to track a trigger element.</p>
+      <div class="code-label">Example</div>
+      <pre><span class="sel">.trigger</span> {
+  <span class="prop">anchor-name</span>: <span class="val">--my-anchor</span>;
+}
+
+<span class="sel">.tooltip</span> {
+  <span class="prop">position</span>: <span class="val">absolute</span>;
+  <span class="prop">position-anchor</span>: <span class="val">--my-anchor</span>;
+
+  <span class="cmt">/* align tooltip bottom to trigger's top */</span>
+  <span class="prop">bottom</span>: <span class="fn">anchor(top)</span>;
+  <span class="prop">left</span>: <span class="fn">anchor(center)</span>;
+  <span class="prop">transform</span>: <span class="fn">translateX(-50%)</span>;
+}</pre>
+    </div>
+  </div>
+
+  <!-- Relative Color Syntax -->
+  <div class="card" data-category="color">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <div class="card-icon cat-color">🎨</div>
+        <div class="card-meta">
+          <div class="card-category text-color">Color</div>
+          <div class="card-title">Relative Color Syntax</div>
+        </div>
+      </div>
+      <div class="card-toggle">+</div>
+    </div>
+    <div class="card-body">
+      <p class="card-desc">Derive a new color from an existing one by manipulating its individual channels — without a preprocessor. You can lighten, darken, desaturate, or change the alpha of any color using the <code>from</code> keyword.</p>
+      <div class="code-label">Example</div>
+      <pre><span class="prop">--primary</span>: <span class="val">#3b82f6</span>;
+
+<span class="sel">.btn</span> {
+  <span class="prop">background</span>: <span class="val">var(--primary)</span>;
+
+  <span class="cmt">/* 30% lighter version */</span>
+  <span class="prop">color</span>: <span class="fn">oklch</span>(<span class="kw">from</span> <span class="val">var(--primary)</span> <span class="fn">calc(l + 0.3)</span> c h);
+
+  <span class="cmt">/* 50% transparent version */</span>
+  <span class="prop">box-shadow</span>: <span class="val">0 0 0 4px</span> <span class="fn">oklch</span>(<span class="kw">from</span> <span class="val">var(--primary)</span> l c h / <span class="val">50%</span>);
+}</pre>
+    </div>
+  </div>
+
+  <!-- color-mix() -->
+  <div class="card" data-category="color">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <div class="card-icon cat-color">🧪</div>
+        <div class="card-meta">
+          <div class="card-category text-color">Color</div>
+          <div class="card-title">color-mix()</div>
+        </div>
+      </div>
+      <div class="card-toggle">+</div>
+    </div>
+    <div class="card-body">
+      <p class="card-desc">Mix two colors together in a specified color space with a defined ratio. Useful for creating tints, shades, and intermediate palette values directly in CSS.</p>
+      <div class="code-label">Example</div>
+      <pre><span class="cmt">/* 30% white mixed with the primary → a tint */</span>
+<span class="prop">--tint</span>: <span class="fn">color-mix</span>(<span class="kw">in</span> <span class="val">oklch</span>, <span class="val">var(--primary)</span>, <span class="val">white</span> <span class="val">30%</span>);
+
+<span class="cmt">/* Semi-transparent overlay */</span>
+<span class="prop">--overlay</span>: <span class="fn">color-mix</span>(<span class="kw">in</span> <span class="val">srgb</span>, <span class="val">black</span> <span class="val">40%</span>, <span class="val">transparent</span>);
+
+<span class="sel">.badge</span> {
+  <span class="prop">background</span>: <span class="fn">color-mix</span>(<span class="kw">in</span> <span class="val">hsl</span>, <span class="val">royalblue</span>, <span class="val">coral</span> <span class="val">50%</span>);
+}</pre>
+    </div>
+  </div>
+
+  <!-- New color spaces -->
+  <div class="card" data-category="color">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <div class="card-icon cat-color">🌈</div>
+        <div class="card-meta">
+          <div class="card-category text-color">Color</div>
+          <div class="card-title">New Color Spaces (oklch, lab, display-p3…)</div>
+        </div>
+      </div>
+      <div class="card-toggle">+</div>
+    </div>
+    <div class="card-body">
+      <p class="card-desc">CSS now supports wide-gamut color spaces beyond sRGB: <code>oklch</code>, <code>oklab</code>, <code>lab</code>, <code>lch</code>, <code>display-p3</code>, and more. <code>oklch</code> is perceptually uniform — adjusting lightness doesn't shift the perceived hue, making it ideal for design systems.</p>
+      <div class="code-label">Example</div>
+      <pre><span class="cmt">/* oklch(lightness chroma hue) */</span>
+<span class="prop">--brand</span>: <span class="fn">oklch</span>(<span class="val">0.65 0.2 260</span>);
+
+<span class="cmt">/* Vibrant P3 color — impossible in sRGB */</span>
+<span class="prop">--vivid-green</span>: <span class="fn">color</span>(<span class="val">display-p3 0.1 0.9 0.3</span>);
+
+<span class="cmt">/* Fallback for non-supporting browsers */</span>
+<span class="sel">.btn</span> {
+  <span class="prop">background</span>: <span class="val">#22c55e</span>;         <span class="cmt">/* sRGB fallback */</span>
+  <span class="prop">background</span>: <span class="val">var(--vivid-green)</span>; <span class="cmt">/* P3 override */</span>
+}</pre>
+    </div>
+  </div>
+
+  <!-- if() -->
+  <div class="card" data-category="logic">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <div class="card-icon cat-logic">🔀</div>
+        <div class="card-meta">
+          <div class="card-category text-logic">Logic</div>
+          <div class="card-title">if() — CSS Conditionals</div>
+        </div>
+      </div>
+      <div class="card-toggle">+</div>
+    </div>
+    <div class="card-body">
+      <p class="card-desc">The first explicit branching function in CSS. Returns different values depending on conditions — style queries, media queries, or supports queries. Reduces the need for multiple selector rules just to swap a single value.</p>
+      <div class="code-label">Example</div>
+      <pre><span class="sel">.btn</span> {
+  <span class="prop">background</span>: <span class="fn">if</span>(
+    <span class="prop">style</span>(<span class="prop">--variant</span>: <span class="val">primary</span>): <span class="val">royalblue</span>;
+    <span class="prop">style</span>(<span class="prop">--variant</span>: <span class="val">danger</span>):  <span class="val">crimson</span>;
+    <span class="kw">else</span>:                       <span class="val">gray</span>;
+  );
+}
+
+<span class="cmt">/* Usage */</span>
+<span class="sel">&lt;button style="--variant: danger"&gt;</span>Delete<span class="sel">&lt;/button&gt;</span></pre>
+    </div>
+  </div>
+
+  <!-- @function -->
+  <div class="card" data-category="logic">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <div class="card-icon cat-logic">𝑓</div>
+        <div class="card-meta">
+          <div class="card-category text-logic">Logic</div>
+          <div class="card-title">@function — Custom CSS Functions</div>
+        </div>
+      </div>
+      <div class="card-toggle">+</div>
+    </div>
+    <div class="card-body">
+      <p class="card-desc">Define your own CSS value functions. Unlike custom properties, <code>@function</code> can accept arguments and perform calculations, returning a single value. Brings programming-style abstraction to CSS without a preprocessor.</p>
+      <div class="code-label">Example</div>
+      <pre><span class="kw">@function</span> <span class="fn">--fluid-size</span>(--min, --max) {
+  <span class="prop">result</span>: <span class="fn">clamp</span>(
+    <span class="val">var(--min)</span>,
+    <span class="fn">calc</span>(<span class="val">var(--min)</span> + (<span class="val">var(--max)</span> - <span class="val">var(--min)</span>) * <span class="val">0.5vw</span>),
+    <span class="val">var(--max)</span>
+  );
+}
+
+<span class="sel">h1</span> {
+  <span class="prop">font-size</span>: <span class="fn">--fluid-size</span>(<span class="val">1.5rem</span>, <span class="val">3rem</span>);
+}
+<span class="sel">p</span> {
+  <span class="prop">font-size</span>: <span class="fn">--fluid-size</span>(<span class="val">1rem</span>, <span class="val">1.25rem</span>);
+}</pre>
+    </div>
+  </div>
+
+  <!-- :is() and :where() -->
+  <div class="card" data-category="selectors">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <div class="card-icon cat-selectors">🧩</div>
+        <div class="card-meta">
+          <div class="card-category text-selectors">Selectors</div>
+          <div class="card-title">:is() and :where()</div>
+        </div>
+      </div>
+      <div class="card-toggle">+</div>
+    </div>
+    <div class="card-body">
+      <p class="card-desc">Both accept a selector list and match any element in it. <code>:is()</code> adopts the specificity of its most specific argument; <code>:where()</code> always has zero specificity — great for resets and base styles you want easily overridden.</p>
+      <div class="code-label">Example</div>
+      <pre><span class="cmt">/* Instead of h1,h2,h3,h4 { } */</span>
+<span class="sel">:is(h1, h2, h3, h4)</span> {
+  <span class="prop">line-height</span>: <span class="val">1.2</span>;
+  <span class="prop">font-weight</span>: <span class="val">600</span>;
+}
+
+<span class="cmt">/* Zero-specificity base styles — easily overridden */</span>
+<span class="sel">:where(article, section, aside) p</span> {
+  <span class="prop">margin-bottom</span>: <span class="val">1em</span>;
+}
+
+<span class="cmt">/* Complex selectors simplified */</span>
+<span class="sel">a:is(:hover, :focus)</span> {
+  <span class="prop">color</span>: <span class="val">royalblue</span>;
+}</pre>
+    </div>
+  </div>
+
+  <!-- text-wrap -->
+  <div class="card" data-category="typography">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <div class="card-icon cat-typography">¶</div>
+        <div class="card-meta">
+          <div class="card-category text-typography">Typography</div>
+          <div class="card-title">text-wrap: balance & pretty</div>
+        </div>
+      </div>
+      <div class="card-toggle">+</div>
+    </div>
+    <div class="card-body">
+      <p class="card-desc">Control how text breaks across lines. <code>balance</code> distributes text evenly so no line is dramatically shorter (great for headings). <code>pretty</code> avoids orphaned single words on the last line of a paragraph.</p>
+      <div class="code-label">Example</div>
+      <pre><span class="cmt">/* Balanced heading — no awkward short last line */</span>
+<span class="sel">h1, h2, h3</span> {
+  <span class="prop">text-wrap</span>: <span class="val">balance</span>;
+}
+
+<span class="cmt">/* No orphan at end of paragraphs */</span>
+<span class="sel">p</span> {
+  <span class="prop">text-wrap</span>: <span class="val">pretty</span>;
+}</pre>
+    </div>
+  </div>
+
+  <!-- field-sizing -->
+  <div class="card" data-category="forms">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <div class="card-icon cat-forms">📝</div>
+        <div class="card-meta">
+          <div class="card-category text-forms">Forms & UI</div>
+          <div class="card-title">field-sizing: content</div>
+        </div>
+      </div>
+      <div class="card-toggle">+</div>
+    </div>
+    <div class="card-body">
+      <p class="card-desc">Make form inputs and textareas automatically grow to fit their content, without any JavaScript. Replaces the classic JS auto-resize textarea hack with a single CSS property.</p>
+      <div class="code-label">Example</div>
+      <pre><span class="sel">textarea</span> {
+  <span class="prop">field-sizing</span>: <span class="val">content</span>;
+  <span class="prop">min-height</span>: <span class="val">3lh</span>;  <span class="cmt">/* at least 3 line heights */</span>
+  <span class="prop">max-height</span>: <span class="val">20lh</span>; <span class="cmt">/* cap growth */</span>
+}
+
+<span class="cmt">/* Also works on text inputs — sizes to content */</span>
+<span class="sel">input[type="text"]</span> {
+  <span class="prop">field-sizing</span>: <span class="val">content</span>;
+  <span class="prop">min-width</span>: <span class="val">10ch</span>;
+}</pre>
+    </div>
+  </div>
+
+  <!-- Styleable select -->
+  <div class="card" data-category="forms">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <div class="card-icon cat-forms">🔽</div>
+        <div class="card-meta">
+          <div class="card-category text-forms">Forms & UI</div>
+          <div class="card-title">Styleable &lt;select&gt;</div>
+        </div>
+      </div>
+      <div class="card-toggle">+</div>
+    </div>
+    <div class="card-body">
+      <p class="card-desc">Opt into a fully styleable select menu — including the dropdown picker itself, not just the button. For years the opened dropdown was OS-rendered and uncustomizable; now you can style it like any other element.</p>
+      <div class="code-label">Example</div>
+      <pre><span class="cmt">/* Opt-in to base styles */</span>
+<span class="sel">select, ::picker(select)</span> {
+  <span class="prop">appearance</span>: <span class="val">base-select</span>;
+}
+
+<span class="cmt">/* Now style freely */</span>
+<span class="sel">select</span> {
+  <span class="prop">border</span>: <span class="val">2px solid #3b82f6</span>;
+  <span class="prop">border-radius</span>: <span class="val">8px</span>;
+  <span class="prop">padding</span>: <span class="val">0.5rem 1rem</span>;
+}
+
+<span class="sel">::picker(select)</span> {
+  <span class="prop">background</span>: <span class="val">#1e1e2e</span>;
+  <span class="prop">border-radius</span>: <span class="val">10px</span>;
+  <span class="prop">box-shadow</span>: <span class="val">0 8px 40px rgba(0,0,0,.4)</span>;
+}</pre>
+    </div>
+  </div>
+
+  <!-- Popover -->
+  <div class="card" data-category="forms">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <div class="card-icon cat-forms">💬</div>
+        <div class="card-meta">
+          <div class="card-category text-forms">Forms & UI</div>
+          <div class="card-title">Popover API</div>
+        </div>
+      </div>
+      <div class="card-toggle">+</div>
+    </div>
+    <div class="card-body">
+      <p class="card-desc">A native HTML/CSS popover system. Add <code>popover</code> to any element to give it open/close behaviour at the top layer, with light-dismiss and accessibility built in. Style the backdrop and entry/exit with CSS.</p>
+      <div class="code-label">Example</div>
+      <pre><span class="cmt">/* HTML */</span>
+<span class="sel">&lt;button popovertarget="my-tip"&gt;</span>Hover<span class="sel">&lt;/button&gt;</span>
+<span class="sel">&lt;div id="my-tip" popover&gt;</span>Tooltip content<span class="sel">&lt;/div&gt;</span>
+
+<span class="cmt">/* CSS */</span>
+<span class="sel">[popover]</span> {
+  <span class="prop">background</span>: <span class="val">#222</span>;
+  <span class="prop">border</span>: <span class="val">none</span>;
+  <span class="prop">border-radius</span>: <span class="val">8px</span>;
+  <span class="prop">padding</span>: <span class="val">1rem</span>;
+}
+
+<span class="sel">[popover]::backdrop</span> {
+  <span class="prop">background</span>: <span class="fn">rgba</span>(<span class="val">0,0,0,0.4</span>);
+}</pre>
+    </div>
+  </div>
+
+  <!-- Viewport units -->
+  <div class="card" data-category="layout">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <div class="card-icon cat-layout">📱</div>
+        <div class="card-meta">
+          <div class="card-category text-layout">Layout</div>
+          <div class="card-title">Dynamic Viewport Units (dvh, svh, lvh)</div>
+        </div>
+      </div>
+      <div class="card-toggle">+</div>
+    </div>
+    <div class="card-body">
+      <p class="card-desc">Mobile browsers shrink/grow their chrome (address bar) while scrolling, making plain <code>100vh</code> unreliable. New units solve this: <code>svh</code> (smallest), <code>lvh</code> (largest), and <code>dvh</code> (dynamic — updates as the browser chrome resizes).</p>
+      <div class="code-label">Example</div>
+      <pre><span class="cmt">/* Old approach — breaks on mobile */</span>
+<span class="sel">.hero</span> { <span class="prop">height</span>: <span class="val">100vh</span>; }
+
+<span class="cmt">/* dvh: always matches visible viewport height */</span>
+<span class="sel">.hero</span> { <span class="prop">height</span>: <span class="val">100dvh</span>; }
+
+<span class="cmt">/* svh: uses the smallest (browser chrome visible) */</span>
+<span class="cmt">/* lvh: uses the largest (browser chrome hidden) */</span>
+<span class="sel">.full-screen</span> {
+  <span class="prop">min-height</span>: <span class="val">100svh</span>;
+  <span class="prop">max-height</span>: <span class="val">100lvh</span>;
+}</pre>
+    </div>
+  </div>
+
+  <!-- sibling-count / sibling-index -->
+  <div class="card" data-category="selectors">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <div class="card-icon cat-selectors">🔢</div>
+        <div class="card-meta">
+          <div class="card-category text-selectors">Selectors</div>
+          <div class="card-title">sibling-count() &amp; sibling-index()</div>
+        </div>
+      </div>
+      <div class="card-toggle">+</div>
+    </div>
+    <div class="card-body">
+      <p class="card-desc">Expose the total number of siblings and an element's own index as numeric values directly in CSS — no <code>style="--index: N"</code> hacks in HTML required. Great for staggered animations and auto-calculated layouts.</p>
+      <div class="code-label">Example</div>
+      <pre><span class="sel">li</span> {
+  <span class="cmt">/* Stagger animation delay by index */</span>
+  <span class="prop">animation-delay</span>: <span class="fn">calc</span>(<span class="fn">sibling-index()</span> * <span class="val">0.1s</span>);
+
+  <span class="cmt">/* Hue shift across all items */</span>
+  <span class="prop">color</span>: <span class="fn">hsl</span>(
+    <span class="fn">calc</span>(<span class="fn">sibling-index()</span> / <span class="fn">sibling-count()</span> * <span class="val">360deg</span>)
+    <span class="val">70% 60%</span>
+  );
+}</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============================================================
+     CSS REPLACES JS — SECTION
+     ============================================================ -->
+
+<div class="section-divider"><hr class="section-divider-line"></div>
+
+<div class="section-header">
+  <div class="section-eyebrow">No JavaScript required</div>
+  <h2 class="section-title">What CSS can do now<br>that used to need JS</h2>
+  <p class="section-subtitle">Live, interactive demos — every effect below is powered by pure CSS. Click, scroll, and type to see them in action.</p>
+</div>
+
+<div class="demo-grid">
+
+  <!-- 1. Accordion -->
+  <div class="demo-card">
+    <div class="demo-card-head">
+      <div>
+        <div class="demo-title">Accordion / Animate to Height</div>
+        <div class="demo-desc">Pure <code>&lt;details&gt;</code> + <code>interpolate-size: allow-keywords</code>. No JS height measurement, no <code>max-height</code> hacks.</div>
+      </div>
+      <div class="demo-badge">✦ CSS only</div>
+    </div>
+    <div class="demo-stage" style="flex-direction:column; align-items:stretch; max-width:100%; padding: 24px 32px;">
+      <div class="css-accordion" style="max-width:100%;">
+        <details class="css-accordion-item">
+          <summary>What is container queries?</summary>
+          <div class="css-accordion-body">Style elements based on their parent container's size, not the viewport. A revolution for component design.</div>
+        </details>
+        <details class="css-accordion-item">
+          <summary>What replaced JS scroll listeners?</summary>
+          <div class="css-accordion-body">Scroll-Driven Animations — tie any CSS animation directly to scroll position using <code>animation-timeline: scroll()</code>.</div>
+        </details>
+        <details class="css-accordion-item">
+          <summary>Can CSS do dark mode natively?</summary>
+          <div class="css-accordion-body">Yes — <code>prefers-color-scheme</code> media query plus CSS custom properties means zero JS needed for theming.</div>
+        </details>
+      </div>
+    </div>
+    <div class="demo-code-row">
+      <div class="demo-code-col">
+        <div class="demo-code-label js"><span class="dot"></span>Old way — JavaScript</div>
+        <pre><span class="cmt">// measure, set explicit px height, listen</span>
+btn.addEventListener(<span class="str">'click'</span>, () => {
+  <span class="kw">const</span> h = body.scrollHeight;
+  body.style.height = open ? <span class="val">0</span> : h + <span class="str">'px'</span>;
+  open = !open;
+});</pre>
+      </div>
+      <div class="demo-code-col">
+        <div class="demo-code-label css"><span class="dot"></span>Now — CSS only</div>
+        <pre><span class="sel">html</span> {
+  <span class="prop">interpolate-size</span>: <span class="val">allow-keywords</span>;
+}
+<span class="sel">details .body</span> { <span class="prop">height</span>: <span class="val">0</span>; }
+<span class="sel">details[open] .body</span> {
+  <span class="prop">height</span>: <span class="val">auto</span>; <span class="cmt">/* animates! */</span>
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Scroll Progress Bar -->
+  <div class="demo-card">
+    <div class="demo-card-head">
+      <div>
+        <div class="demo-title">Scroll Progress Bar</div>
+        <div class="demo-desc">No <code>scroll</code> event listeners or <code>getBoundingClientRect()</code>. The bar is driven entirely by <code>animation-timeline: scroll()</code>.</div>
+      </div>
+      <div class="demo-badge">✦ CSS only</div>
+    </div>
+    <div class="demo-stage">
+      <div class="progress-demo-wrap">
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill"></div>
+        </div>
+        <div class="progress-content">
+          <p>Scroll inside this box. The coloured bar above tracks progress using only CSS scroll-driven animations — not a single line of JavaScript.</p>
+          <p>Previously this required attaching a scroll event listener, reading scrollTop and scrollHeight on every frame, and manually setting the width.</p>
+          <p>Now it's a single CSS animation tied to the scroll timeline. It's also more performant — it runs off the main thread.</p>
+          <p>↓ Keep scrolling to see it fill up.</p>
+          <p>The gradient bar at the top is powered by <code>animation-timeline: scroll(nearest block)</code>.</p>
+        </div>
+      </div>
+    </div>
+    <div class="demo-code-row">
+      <div class="demo-code-col">
+        <div class="demo-code-label js"><span class="dot"></span>Old way — JavaScript</div>
+        <pre>window.addEventListener(<span class="str">'scroll'</span>, () => {
+  <span class="kw">const</span> pct = scrollY /
+    (body.scrollHeight - innerHeight);
+  bar.style.width = (pct * <span class="val">100</span>) + <span class="str">'%'</span>;
+});</pre>
+      </div>
+      <div class="demo-code-col">
+        <div class="demo-code-label css"><span class="dot"></span>Now — CSS only</div>
+        <pre><span class="sel">.bar</span> {
+  <span class="prop">transform-origin</span>: <span class="val">left</span>;
+  <span class="prop">animation</span>: <span class="val">grow linear both</span>;
+  <span class="prop">animation-timeline</span>:
+    <span class="fn">scroll(nearest block)</span>;
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Scroll-triggered fade-in -->
+  <div class="demo-card">
+    <div class="demo-card-head">
+      <div>
+        <div class="demo-title">Scroll-Triggered Reveal</div>
+        <div class="demo-desc">Replaces <code>IntersectionObserver</code> + class toggling. Elements fade in as they enter the viewport using <code>animation-timeline: view()</code>.</div>
+      </div>
+      <div class="demo-badge">✦ CSS only</div>
+    </div>
+    <div class="demo-stage">
+      <div class="scroll-fade-wrap">
+        <div class="scroll-fade-inner">
+          <div class="fade-item">① Scroll down to reveal items…</div>
+          <div class="fade-item">② Each card fades + slides up</div>
+          <div class="fade-item">③ No IntersectionObserver needed</div>
+          <div class="fade-item">④ No class toggling in JavaScript</div>
+          <div class="fade-item">⑤ Just animation-timeline: view()</div>
+          <div class="fade-item">⑥ Runs off the main thread</div>
+        </div>
+      </div>
+    </div>
+    <div class="demo-code-row">
+      <div class="demo-code-col">
+        <div class="demo-code-label js"><span class="dot"></span>Old way — JavaScript</div>
+        <pre><span class="kw">const</span> io = <span class="kw">new</span> <span class="fn">IntersectionObserver</span>(entries => {
+  entries.forEach(e => {
+    <span class="kw">if</span> (e.isIntersecting)
+      e.target.classList.add(<span class="str">'visible'</span>);
+  });
+});
+items.forEach(el => io.observe(el));</pre>
+      </div>
+      <div class="demo-code-col">
+        <div class="demo-code-label css"><span class="dot"></span>Now — CSS only</div>
+        <pre><span class="sel">.item</span> {
+  <span class="prop">animation</span>: <span class="val">fade-up linear both</span>;
+  <span class="prop">animation-timeline</span>: <span class="fn">view()</span>;
+  <span class="prop">animation-range</span>:
+    <span class="val">entry 0% entry 60%</span>;
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Sticky header shrink -->
+  <div class="demo-card">
+    <div class="demo-card-head">
+      <div>
+        <div class="demo-title">Sticky Header Shrink on Scroll</div>
+        <div class="demo-desc">The classic "navbar shrinks as you scroll" effect. Previously needed a scroll listener + class swap. Now it's a CSS scroll-driven animation.</div>
+      </div>
+      <div class="demo-badge">✦ CSS only</div>
+    </div>
+    <div class="demo-stage">
+      <div class="scroll-demo-wrap">
+        <div class="sticky-bar">⬛ Site Header — scroll me</div>
+        <div class="scroll-demo-content">
+          <p>Scroll down inside this container. The header above shrinks in height and darkens — driven by CSS scroll-driven animations alone.</p>
+          <p>No event listener. No requestAnimationFrame. No class toggling on scroll.</p>
+          <p>The animation simply maps scroll progress to the keyframe timeline.</p>
+          <p>↑ Scroll back up to see it restore.</p>
+        </div>
+      </div>
+    </div>
+    <div class="demo-code-row">
+      <div class="demo-code-col">
+        <div class="demo-code-label js"><span class="dot"></span>Old way — JavaScript</div>
+        <pre>window.addEventListener(<span class="str">'scroll'</span>, () => {
+  header.classList.toggle(
+    <span class="str">'shrunk'</span>, scrollY > <span class="val">60</span>
+  );
+});</pre>
+      </div>
+      <div class="demo-code-col">
+        <div class="demo-code-label css"><span class="dot"></span>Now — CSS only</div>
+        <pre><span class="sel">.header</span> {
+  <span class="prop">animation</span>: <span class="val">shrink linear both</span>;
+  <span class="prop">animation-timeline</span>:
+    <span class="fn">scroll(nearest block)</span>;
+  <span class="prop">animation-range</span>: <span class="val">0px 60px</span>;
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. :has() Smart Form -->
+  <div class="demo-card">
+    <div class="demo-card-head">
+      <div>
+        <div class="demo-title">Smart Form — Conditional Styling with :has()</div>
+        <div class="demo-desc">Fields highlight on focus, turn red on invalid input, and the submit button only activates when all fields are valid — all via CSS <code>:has()</code>.</div>
+      </div>
+      <div class="demo-badge">✦ CSS only</div>
+    </div>
+    <div class="demo-stage" style="flex-direction: column;">
+      <div class="has-demo-form">
+        <div class="has-field">
+          <label>Name</label>
+          <input type="text" placeholder="Your name" required minlength="2">
+        </div>
+        <div class="has-field">
+          <label>Email</label>
+          <input type="email" placeholder="you@example.com" required>
+        </div>
+        <button class="has-submit">Submit →</button>
+      </div>
+    </div>
+    <div class="demo-code-row">
+      <div class="demo-code-col">
+        <div class="demo-code-label js"><span class="dot"></span>Old way — JavaScript</div>
+        <pre>inputs.forEach(input => {
+  input.addEventListener(<span class="str">'input'</span>, () => {
+    field.classList.toggle(<span class="str">'invalid'</span>,
+      !input.checkValidity());
+    btn.disabled = !form.checkValidity();
+  });
+});</pre>
+      </div>
+      <div class="demo-code-col">
+        <div class="demo-code-label css"><span class="dot"></span>Now — CSS only</div>
+        <pre><span class="sel">.field:has(input:focus)</span> {
+  <span class="prop">border-color</span>: <span class="val">teal</span>;
+}
+<span class="sel">.field:has(input:invalid)</span> {
+  <span class="prop">border-color</span>: <span class="val">red</span>;
+}
+<span class="sel">form:has(input:valid) .btn</span> {
+  <span class="prop">background</span>: <span class="val">teal</span>;
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. CSS-only tooltips -->
+  <div class="demo-card">
+    <div class="demo-card-head">
+      <div>
+        <div class="demo-title">Tooltips</div>
+        <div class="demo-desc">Hover over the buttons. Pure CSS <code>:hover</code> + <code>opacity</code> + <code>transform</code> transition — no JS mouseover listeners or dynamic positioning.</div>
+      </div>
+      <div class="demo-badge">✦ CSS only</div>
+    </div>
+    <div class="demo-stage">
+      <div class="tooltip-demo">
+        <div class="css-tooltip-wrap">
+          <div class="css-tooltip-btn">Hover me ↑</div>
+          <div class="css-tooltip">Powered by CSS :hover</div>
+        </div>
+        <div class="css-tooltip-wrap">
+          <div class="css-tooltip-btn">And me ↑</div>
+          <div class="css-tooltip">No JavaScript at all!</div>
+        </div>
+        <div class="css-tooltip-wrap">
+          <div class="css-tooltip-btn">Me too ↑</div>
+          <div class="css-tooltip">opacity + transform transition</div>
+        </div>
+      </div>
+    </div>
+    <div class="demo-code-row">
+      <div class="demo-code-col">
+        <div class="demo-code-label js"><span class="dot"></span>Old way — JavaScript</div>
+        <pre>el.addEventListener(<span class="str">'mouseenter'</span>, e => {
+  tip.style.display = <span class="str">'block'</span>;
+  tip.style.top = e.clientY + <span class="str">'px'</span>;
+  tip.style.left = e.clientX + <span class="str">'px'</span>;
+});</pre>
+      </div>
+      <div class="demo-code-col">
+        <div class="demo-code-label css"><span class="dot"></span>Now — CSS only</div>
+        <pre><span class="sel">.tooltip</span> { <span class="prop">opacity</span>: <span class="val">0</span>; }
+
+<span class="sel">.wrap:hover .tooltip</span> {
+  <span class="prop">opacity</span>: <span class="val">1</span>;
+  <span class="prop">transform</span>: <span class="fn">translateY(0)</span>;
+}</pre>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>~ 19 features · 6 live demos · CSS 2024–2025 ~</span>
+</footer>
+
+<script>
+  function toggle(header) {
+    const card = header.closest('.card');
+    card.classList.toggle('open');
+  }
+
+  // Filters
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      document.querySelectorAll('.card').forEach(card => {
+        if (filter === 'all' || card.dataset.category === filter) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+          card.classList.remove('open');
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>
